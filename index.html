@@ -588,9 +588,9 @@ body {
         <div id="dashContent"></div>
       `;
       renderWide(html);
-      switchDashTab('disponiveis', ativas.length);
-      // Armazenar dados para as abas
+      // ✅ CORRIGIDO: _dashData definido ANTES de chamar switchDashTab
       window._dashData = { ativas, pendentes, allP, allU, isAdmin };
+      switchDashTab('disponiveis', ativas.length);
     } else {
       html += `
         <div class="tabs" id="dashTabs" style="margin-bottom:20px;">
@@ -600,8 +600,9 @@ body {
         <div id="dashContent"></div>
       `;
       renderWide(html);
-      switchDashTabUser('disponiveis');
+      // ✅ CORRIGIDO: _dashDataUser definido ANTES de chamar switchDashTabUser
       window._dashDataUser = { pautasDisponiveis, minhasPautas, allU, isAdmin };
+      switchDashTabUser('disponiveis');
     }
 
     html += `</div>`;
