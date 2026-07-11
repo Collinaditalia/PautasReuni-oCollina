@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pautas de Reunião</title>
 
+    <!-- ========== FIREBASE SDK ========== -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js">
+    </script>
+
     <!-- ========== ESTILOS ========== -->
     <style>
         :root {
@@ -46,7 +52,6 @@
             background-attachment: fixed;
         }
 
-        /* ===== SCROLLBAR ===== */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -58,7 +63,6 @@
             border-radius: 10px;
         }
 
-        /* ===== CONTAINER PRINCIPAL ===== */
         .app-container {
             width: 100%;
             max-width: 520px;
@@ -80,7 +84,6 @@
             }
         }
 
-        /* ===== CARDS ===== */
         .card {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -88,13 +91,11 @@
             padding: 36px 32px;
             box-shadow: var(--shadow);
         }
-
         .card-header {
             text-align: center;
             margin-bottom: 32px;
         }
 
-        /* ===== IMAGEM DO HEADER ===== */
         .header-image {
             width: 100%;
             height: 160px;
@@ -121,7 +122,6 @@
             margin-top: 4px;
         }
 
-        /* ===== FORMULÁRIOS ===== */
         .form-group {
             margin-bottom: 18px;
         }
@@ -159,7 +159,6 @@
             min-height: 100px;
         }
 
-        /* ===== BOTÕES ===== */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -221,7 +220,6 @@
             border-radius: 6px;
         }
 
-        /* ===== LINKS ===== */
         .link {
             color: var(--accent2);
             cursor: pointer;
@@ -258,7 +256,6 @@
             right: 0;
         }
 
-        /* ===== TOP BAR (logado) ===== */
         .topbar {
             display: flex;
             align-items: center;
@@ -302,7 +299,6 @@
             color: var(--green);
         }
 
-        /* ===== LISTA DE PAUTAS ===== */
         .pauta-card {
             background: var(--surface2);
             border: 1px solid var(--border);
@@ -344,7 +340,30 @@
             margin-bottom: 12px;
         }
 
-        /* ===== MODAL ===== */
+        /* ===== LOADING ===== */
+        .loading-spinner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            flex-direction: column;
+            gap: 14px;
+            color: var(--text2);
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -408,7 +427,6 @@
             color: #fff;
         }
 
-        /* ===== CHECKBOX LIST ===== */
         .checkbox-list {
             max-height: 200px;
             overflow-y: auto;
@@ -437,7 +455,6 @@
             cursor: pointer;
         }
 
-        /* ===== TOAST ===== */
         .toast {
             position: fixed;
             top: 20px;
@@ -483,7 +500,6 @@
             color: var(--accent2);
         }
 
-        /* ===== TABS ===== */
         .tabs {
             display: flex;
             gap: 4px;
@@ -514,7 +530,6 @@
             background: rgba(255, 255, 255, 0.04);
         }
 
-        /* ===== RESPONSIVO ===== */
         @media (max-width: 600px) {
             .card {
                 padding: 24px 18px;
@@ -548,38 +563,69 @@
 
     <!-- ========== APP CONTAINER ========== -->
     <div class="app-container" id="appContainer">
-        <!-- Renderizado dinamicamente pelo JS -->
+        <div class="card">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <p>Conectando ao servidor...</p>
+            </div>
+        </div>
     </div>
 
     <!-- ========== LÓGICA DA APLICAÇÃO ========== -->
     <script>
         (function() {
-            // ==================== BANCO DE DADOS LOCAL ====================
-            const DB_KEY = 'pautas_reuniao_db';
+            // ==================== CONFIGURAÇÃO DO FIREBASE ====================
+            // ⚠️ SUBSTITUA com os dados do SEU projeto Firebase:
+            //    1. Acesse https://console.firebase.google.com/
+            //    2. Crie um projeto (ou use um existente)
+            //    3. Vá em "Configurações do Projeto" > "Seus aplicativos" > "App da Web"
+            //    4. Copie o objeto firebaseConfig abaixo
 
-            function getDB() {
-                const raw = localStorage.getItem(DB_KEY);
-                if (raw) return JSON.parse(raw);
-                // Estrutura inicial
-                const initial = {
-                    users: [], // { id, name, username, password, role: 'admin'|'user', createdAt }
-                    pautas: [], // { id, title, date, content, createdBy, allowedUsers: [userId], createdAt }
-                    adminExists: false,
-                };
-                saveDB(initial);
-                return initial;
-            }
+            const firebaseConfig = {
+                apiKey: "AIzaSyEXEMPLO-REPLACE-WITH-YOUR-KEY",
+                authDomain: "SEU-PROJETO.firebaseapp.com",
+                databaseURL: "https://SEU-PROJETO-default-rtdb.firebaseio.com",
+                projectId: "SEU-PROJETO",
+                storageBucket: "SEU-PROJETO.appspot.com",
+                messagingSenderId: "000000000000",
+                appId: "1:000000000000:web:xxxxxxxxxxxxxxxxxxxx"
+            };
 
-            function saveDB(db) {
-                localStorage.setItem(DB_KEY, JSON.stringify(db));
-            }
+            // Inicializa Firebase
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.database();
 
-            function generateId() {
-                return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            }
+            // ==================== REFERÊNCIAS DO BANCO ====================
+            const usersRef = db.ref('users');
+            const pautasRef = db.ref('pautas');
+            const configRef = db.ref('config');
 
             // ==================== SESSÃO ====================
-            let currentUser = null; // objeto do usuário logado
+            let currentUser = null;
+
+            // Persiste sessão no sessionStorage (sobrevive a refresh, mas não a fechar o navegador)
+            function saveSession(user) {
+                currentUser = user;
+                sessionStorage.setItem('currentUserId', user.id);
+            }
+
+            function clearSession() {
+                currentUser = null;
+                sessionStorage.removeItem('currentUserId');
+            }
+
+            async function restoreSession() {
+                const userId = sessionStorage.getItem('currentUserId');
+                if (userId) {
+                    const snapshot = await usersRef.child(userId).once('value');
+                    const user = snapshot.val();
+                    if (user) {
+                        currentUser = user;
+                        return true;
+                    }
+                }
+                return false;
+            }
 
             // ==================== UTILITÁRIOS ====================
             function escapeHTML(str) {
@@ -607,6 +653,16 @@
                 setTimeout(() => toast.remove(), 3000);
             }
 
+            function generateId() {
+                return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            }
+
+            // Converte objeto do Firebase em array
+            function objToArray(obj) {
+                if (!obj) return [];
+                return Object.values(obj);
+            }
+
             // ==================== RENDERIZAÇÃO ====================
             const appContainer = document.getElementById('appContainer');
 
@@ -622,7 +678,7 @@
 
             // ==================== TELA DE LOGIN ====================
             function renderLogin() {
-                currentUser = null;
+                clearSession();
                 appContainer.classList.remove('wide');
                 render(`
                     <div class="card">
@@ -647,14 +703,14 @@
                 renderLoginForm();
             }
 
-            function switchTab(tab) {
+            window.switchTab = function(tab) {
                 document.querySelectorAll('#loginTabs .tab').forEach((t, i) => {
                     t.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'register' && i ===
                         1));
                 });
                 if (tab === 'login') renderLoginForm();
                 else renderRegisterForm();
-            }
+            };
 
             function renderLoginForm() {
                 document.getElementById('tabContent').innerHTML = `
@@ -693,39 +749,48 @@
             }
 
             // ==================== HANDLERS DE AUTENTICAÇÃO ====================
-            window.handleLogin = function(event) {
+            window.handleLogin = async function(event) {
                 event.preventDefault();
                 const username = document.getElementById('loginUser').value.trim();
                 const password = document.getElementById('loginPass').value.trim();
-                const db = getDB();
 
-                const user = db.users.find(u => u.username === username && u.password === password);
+                const snapshot = await usersRef.once('value');
+                const users = objToArray(snapshot.val());
+
+                const user = users.find(u => u.username === username && u.password === password);
                 if (!user) {
                     showToast('Usuário ou senha inválidos.', 'error');
                     return;
                 }
-                currentUser = user;
+                saveSession(user);
                 showToast(`Bem-vindo(a), ${user.name}!`, 'success');
-                renderDashboard();
+                await renderDashboard();
             };
 
-            window.handleRegister = function(event) {
+            window.handleRegister = async function(event) {
                 event.preventDefault();
                 const name = document.getElementById('regName').value.trim();
                 const username = document.getElementById('regUser').value.trim();
                 const password = document.getElementById('regPass').value.trim();
-                const db = getDB();
 
                 if (password.length < 4) {
                     showToast('A senha deve ter no mínimo 4 caracteres.', 'error');
                     return;
                 }
-                if (db.users.find(u => u.username === username)) {
+
+                // Verifica se já existe admin (primeiro usuário do sistema)
+                const configSnapshot = await configRef.child('adminExists').once('value');
+                const adminExists = configSnapshot.val() === true;
+
+                // Verifica se usuário já existe
+                const usersSnapshot = await usersRef.once('value');
+                const users = objToArray(usersSnapshot.val());
+                if (users.find(u => u.username === username)) {
                     showToast('Este nome de usuário já está em uso.', 'error');
                     return;
                 }
 
-                const isFirstUser = !db.adminExists;
+                const isFirstUser = !adminExists;
                 const role = isFirstUser ? 'admin' : 'user';
 
                 const newUser = {
@@ -737,9 +802,11 @@
                     createdAt: new Date().toISOString(),
                 };
 
-                db.users.push(newUser);
-                if (isFirstUser) db.adminExists = true;
-                saveDB(db);
+                // Salva no Firebase
+                await usersRef.child(newUser.id).set(newUser);
+                if (isFirstUser) {
+                    await configRef.child('adminExists').set(true);
+                }
 
                 showToast(
                     isFirstUser ?
@@ -749,35 +816,47 @@
                 );
 
                 if (isFirstUser) {
-                    currentUser = newUser;
-                    renderDashboard();
+                    saveSession(newUser);
+                    await renderDashboard();
                 } else {
                     switchTab('login');
                     renderLoginForm();
                 }
             };
 
-            window.handleLogout = function() {
-                currentUser = null;
+            window.handleLogout = async function() {
+                clearSession();
                 showToast('Sessão encerrada.', 'info');
                 renderLogin();
             };
 
             // ==================== DASHBOARD ====================
-            function renderDashboard() {
+            async function renderDashboard() {
                 if (!currentUser) {
-                    renderLogin();
-                    return;
+                    // Tenta restaurar sessão
+                    const restored = await restoreSession();
+                    if (!restored) {
+                        renderLogin();
+                        return;
+                    }
                 }
-                const db = getDB();
+
+                // Recarrega dados atualizados do Firebase
+                const usersSnapshot = await usersRef.once('value');
+                const allUsers = objToArray(usersSnapshot.val());
+
+                const pautasSnapshot = await pautasRef.once('value');
+                const allPautas = objToArray(pautasSnapshot.val());
+
                 const isAdmin = currentUser.role === 'admin';
 
                 let pautasVisiveis;
                 if (isAdmin) {
-                    pautasVisiveis = db.pautas;
+                    pautasVisiveis = allPautas;
                 } else {
-                    pautasVisiveis = db.pautas.filter(p =>
-                        p.allowedUsers.includes(currentUser.id) || p.createdBy === currentUser.id
+                    pautasVisiveis = allPautas.filter(p =>
+                        (p.allowedUsers && p.allowedUsers.includes(currentUser.id)) || p.createdBy ===
+                        currentUser.id
                     );
                 }
 
@@ -815,15 +894,16 @@
                     `;
                 } else {
                     pautasVisiveis.forEach(p => {
-                        const criador = db.users.find(u => u.id === p.createdBy);
+                        const criador = allUsers.find(u => u.id === p.createdBy);
                         const criadorNome = criador ? criador.name : 'Desconhecido';
+                        const qtdPermitidos = p.allowedUsers ? p.allowedUsers.length : 0;
                         html += `
                             <div class="pauta-card" onclick="abrirPauta('${p.id}')">
                                 <h3>📌 ${escapeHTML(p.title)}</h3>
                                 <div class="meta">
                                     <span>📅 ${formatDate(p.createdAt)}</span>
                                     <span>👤 Por: ${escapeHTML(criadorNome)}</span>
-                                    <span>🔒 ${p.allowedUsers.length} pessoa(s) autorizada(s)</span>
+                                    <span>🔒 ${qtdPermitidos} pessoa(s) autorizada(s)</span>
                                 </div>
                             </div>
                         `;
@@ -835,10 +915,12 @@
             }
 
             // ==================== NOVA PAUTA (ADMIN) ====================
-            window.renderNovaPauta = function() {
+            window.renderNovaPauta = async function() {
                 if (!currentUser || currentUser.role !== 'admin') return;
-                const db = getDB();
-                const usuarios = db.users.filter(u => u.id !== currentUser.id);
+
+                const usersSnapshot = await usersRef.once('value');
+                const allUsers = objToArray(usersSnapshot.val());
+                const usuarios = allUsers.filter(u => u.id !== currentUser.id);
 
                 let usuariosHTML = '';
                 if (usuarios.length === 0) {
@@ -859,7 +941,6 @@
                         '<p style="color:var(--text2);font-size:0.75rem;margin-top:6px;">Marque os usuários que poderão visualizar esta pauta.</p>';
                 }
 
-                // Overlay/modal inline
                 const overlay = document.createElement('div');
                 overlay.className = 'modal-overlay';
                 overlay.innerHTML = `
@@ -889,16 +970,14 @@
                 `;
                 document.body.appendChild(overlay);
 
-                // Fechar ao clicar fora
                 overlay.addEventListener('click', function(e) {
                     if (e.target === overlay) overlay.remove();
                 });
 
-                // Data padrão = hoje
                 document.getElementById('pautaDate').value = new Date().toISOString().split('T')[0];
             };
 
-            window.handleCriarPauta = function(event) {
+            window.handleCriarPauta = async function(event) {
                 event.preventDefault();
                 const title = document.getElementById('pautaTitle').value.trim();
                 const date = document.getElementById('pautaDate').value;
@@ -906,7 +985,6 @@
                 const checkboxes = document.querySelectorAll('.perm-check:checked');
                 const allowedUsers = Array.from(checkboxes).map(cb => cb.value);
 
-                const db = getDB();
                 const novaPauta = {
                     id: generateId(),
                     title,
@@ -917,39 +995,48 @@
                     createdAt: new Date().toISOString(),
                 };
 
-                db.pautas.push(novaPauta);
-                saveDB(db);
+                // Salva no Firebase
+                await pautasRef.child(novaPauta.id).set(novaPauta);
 
-                // Fechar modal
                 document.querySelector('.modal-overlay')?.remove();
                 showToast('Pauta criada com sucesso!', 'success');
-                renderDashboard();
+                await renderDashboard();
             };
 
-            // ==================== ABRIR PAUTA (VISUALIZAÇÃO) ====================
-            window.abrirPauta = function(pautaId) {
+            // ==================== ABRIR PAUTA ====================
+            window.abrirPauta = async function(pautaId) {
                 if (!currentUser) return;
-                const db = getDB();
-                const pauta = db.pautas.find(p => p.id === pautaId);
-                if (!pauta) return;
+
+                const pautaSnapshot = await pautasRef.child(pautaId).once('value');
+                const pauta = pautaSnapshot.val();
+                if (!pauta) {
+                    showToast('Pauta não encontrada.', 'error');
+                    return;
+                }
+
+                const usersSnapshot = await usersRef.once('value');
+                const allUsers = objToArray(usersSnapshot.val());
 
                 const isAdmin = currentUser.role === 'admin';
-                const temPermissao = isAdmin || pauta.allowedUsers.includes(currentUser.id) || pauta.createdBy ===
-                    currentUser.id;
+                const temPermissao = isAdmin ||
+                    (pauta.allowedUsers && pauta.allowedUsers.includes(currentUser.id)) ||
+                    pauta.createdBy === currentUser.id;
 
                 if (!temPermissao) {
                     showToast('Você não tem permissão para ver esta pauta.', 'error');
                     return;
                 }
 
-                const criador = db.users.find(u => u.id === pauta.createdBy);
+                const criador = allUsers.find(u => u.id === pauta.createdBy);
                 const criadorNome = criador ? criador.name : 'Desconhecido';
 
-                const usuariosPermitidos = pauta.allowedUsers
-                    .map(uid => db.users.find(u => u.id === uid))
+                const usuariosPermitidos = pauta.allowedUsers ?
+                    pauta.allowedUsers
+                    .map(uid => allUsers.find(u => u.id === uid))
                     .filter(Boolean)
                     .map(u => u.name)
-                    .join(', ') || 'Nenhum';
+                    .join(', ') :
+                    'Nenhum';
 
                 const overlay = document.createElement('div');
                 overlay.className = 'modal-overlay';
@@ -983,14 +1070,17 @@
                 });
             };
 
-            // ==================== EDITAR PAUTA (ADMIN - PERMISSÕES) ====================
-            window.editarPauta = function(pautaId) {
+            // ==================== EDITAR PERMISSÕES ====================
+            window.editarPauta = async function(pautaId) {
                 if (!currentUser || currentUser.role !== 'admin') return;
-                const db = getDB();
-                const pauta = db.pautas.find(p => p.id === pautaId);
+
+                const pautaSnapshot = await pautasRef.child(pautaId).once('value');
+                const pauta = pautaSnapshot.val();
                 if (!pauta) return;
 
-                const usuarios = db.users.filter(u => u.id !== currentUser.id);
+                const usersSnapshot = await usersRef.once('value');
+                const allUsers = objToArray(usersSnapshot.val());
+                const usuarios = allUsers.filter(u => u.id !== currentUser.id);
 
                 let usuariosHTML = '';
                 if (usuarios.length === 0) {
@@ -999,7 +1089,8 @@
                 } else {
                     usuariosHTML = '<div class="checkbox-list">';
                     usuarios.forEach(u => {
-                        const checked = pauta.allowedUsers.includes(u.id) ? 'checked' : '';
+                        const checked = pauta.allowedUsers && pauta.allowedUsers.includes(u.id) ? 'checked' :
+                            '';
                         usuariosHTML += `
                             <label class="checkbox-item">
                                 <input type="checkbox" value="${u.id}" class="perm-check-edit" ${checked} />
@@ -1010,7 +1101,6 @@
                     usuariosHTML += '</div>';
                 }
 
-                // Fechar modal anterior
                 document.querySelector('.modal-overlay')?.remove();
 
                 const overlay = document.createElement('div');
@@ -1034,52 +1124,60 @@
                 });
             };
 
-            window.salvarPermissoes = function(pautaId) {
-                const db = getDB();
-                const pauta = db.pautas.find(p => p.id === pautaId);
-                if (!pauta) return;
-
+            window.salvarPermissoes = async function(pautaId) {
                 const checkboxes = document.querySelectorAll('.perm-check-edit:checked');
-                pauta.allowedUsers = Array.from(checkboxes).map(cb => cb.value);
-                saveDB(db);
+                const allowedUsers = Array.from(checkboxes).map(cb => cb.value);
+
+                await pautasRef.child(pautaId).child('allowedUsers').set(allowedUsers);
 
                 document.querySelector('.modal-overlay')?.remove();
                 showToast('Permissões atualizadas!', 'success');
-                renderDashboard();
+                await renderDashboard();
             };
 
             // ==================== EXCLUIR PAUTA ====================
-            window.excluirPauta = function(pautaId) {
+            window.excluirPauta = async function(pautaId) {
                 if (!currentUser || currentUser.role !== 'admin') return;
                 if (!confirm('Tem certeza que deseja excluir esta pauta? Esta ação não pode ser desfeita.')) return;
 
-                const db = getDB();
-                db.pautas = db.pautas.filter(p => p.id !== pautaId);
-                saveDB(db);
+                await pautasRef.child(pautaId).remove();
 
                 document.querySelector('.modal-overlay')?.remove();
                 showToast('Pauta excluída.', 'info');
-                renderDashboard();
+                await renderDashboard();
             };
 
-            // ==================== EXPORTAR FUNÇÕES GLOBAIS ====================
-            window.switchTab = switchTab;
-            window.renderNovaPauta = renderNovaPauta;
-            window.handleCriarPauta = handleCriarPauta;
-            window.abrirPauta = abrirPauta;
-            window.editarPauta = editarPauta;
-            window.salvarPermissoes = salvarPermissoes;
-            window.excluirPauta = excluirPauta;
-            window.handleLogout = handleLogout;
-            window.handleLogin = handleLogin;
-            window.handleRegister = handleRegister;
-
             // ==================== INICIALIZAÇÃO ====================
-            function init() {
-                // Garantir que o DB existe
-                getDB();
-                // Se já houver sessão ativa (improvável no recarregar), vai pro login
-                renderLogin();
+            async function init() {
+                try {
+                    // Tenta restaurar sessão anterior
+                    const hasSession = await restoreSession();
+                    if (hasSession) {
+                        await renderDashboard();
+                    } else {
+                        renderLogin();
+                    }
+                } catch (error) {
+                    console.error('Erro ao inicializar:', error);
+                    render(`
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="logo-icon">⚠️</div>
+                                <h1>Erro de Conexão</h1>
+                                <p>Não foi possível conectar ao banco de dados.</p>
+                            </div>
+                            <div class="empty-state">
+                                <p>Verifique se:</p>
+                                <ul style="text-align:left;margin-top:10px;line-height:1.8;color:var(--text2);">
+                                    <li>O <strong>firebaseConfig</strong> está correto</li>
+                                    <li>O <strong>Realtime Database</strong> foi ativado no Firebase</li>
+                                    <li>As regras do banco permitem leitura/escrita</li>
+                                </ul>
+                                <button class="btn btn-primary" onclick="location.reload()" style="margin-top:20px;width:auto;">🔄 Tentar Novamente</button>
+                            </div>
+                        </div>
+                    `);
+                }
             }
 
             init();
