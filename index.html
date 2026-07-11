@@ -8,20 +8,21 @@
     <!-- ========== ESTILOS ========== -->
     <style>
         :root {
-            --bg: #0f0f14;
-            --surface: #1a1a24;
-            --surface2: #22222f;
-            --border: #2a2a3a;
-            --text: #e1e1ec;
-            --text2: #9898b0;
-            --accent: #6c5ce7;
-            --accent2: #a29bfe;
-            --green: #00d2a0;
-            --red: #ff5e5e;
-            --gold: #f0c040;
+            --bg: #05060d;
+            --surface: #0b0f1d;
+            --surface2: #11172b;
+            --border: #1b2540;
+            --text: #e2e8f0;
+            --text2: #8495b8;
+            --accent: #3b82f6;
+            --accent2: #60a5fa;
+            --accent-glow: rgba(59, 130, 246, 0.20);
+            --green: #10b981;
+            --red: #ef4444;
+            --gold: #f59e0b;
             --radius: 14px;
             --radius-sm: 10px;
-            --shadow: 0 8px 40px rgba(0, 0, 0, 0.45);
+            --shadow: 0 10px 50px rgba(0, 0, 0, 0.55);
             --font: 'Segoe UI', 'Inter', system-ui, sans-serif;
         }
 
@@ -40,15 +41,14 @@
             align-items: center;
             justify-content: center;
             background-image:
-                radial-gradient(ellipse at 20% 20%, rgba(108, 92, 231, 0.08) 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 70%, rgba(0, 210, 160, 0.06) 0%, transparent 60%),
-                radial-gradient(ellipse at 50% 50%, rgba(240, 192, 64, 0.03) 0%, transparent 70%);
+                radial-gradient(ellipse at 15% 10%, rgba(59, 130, 246, 0.07) 0%, transparent 55%),
+                radial-gradient(ellipse at 85% 80%, rgba(59, 130, 246, 0.05) 0%, transparent 55%),
+                radial-gradient(ellipse at 50% 50%, rgba(30, 40, 80, 0.12) 0%, transparent 70%);
             background-attachment: fixed;
         }
 
-        /* ===== SCROLLBAR ===== */
         ::-webkit-scrollbar {
-            width: 6px;
+            width: 5px;
         }
         ::-webkit-scrollbar-track {
             background: transparent;
@@ -58,7 +58,6 @@
             border-radius: 10px;
         }
 
-        /* ===== CONTAINER PRINCIPAL ===== */
         .app-container {
             width: 100%;
             max-width: 520px;
@@ -80,7 +79,6 @@
             }
         }
 
-        /* ===== CARDS ===== */
         .card {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -94,7 +92,6 @@
             margin-bottom: 32px;
         }
 
-        /* ===== IMAGEM DO HEADER ===== */
         .header-image {
             width: 100%;
             height: 160px;
@@ -102,7 +99,7 @@
             object-fit: cover;
             margin-bottom: 24px;
             border: 1px solid var(--border);
-            filter: brightness(0.85);
+            filter: brightness(0.7) saturate(0.9);
         }
 
         .logo-icon {
@@ -121,17 +118,16 @@
             margin-top: 4px;
         }
 
-        /* ===== FORMULÁRIOS ===== */
         .form-group {
             margin-bottom: 18px;
         }
         .form-group label {
             display: block;
-            font-size: 0.82rem;
+            font-size: 0.80rem;
             font-weight: 600;
             color: var(--text2);
             margin-bottom: 6px;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.4px;
             text-transform: uppercase;
         }
         .form-group input,
@@ -152,14 +148,35 @@
         .form-group textarea:focus,
         .form-group select:focus {
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+            box-shadow: 0 0 0 3px var(--accent-glow);
         }
         .form-group textarea {
             resize: vertical;
             min-height: 100px;
         }
 
-        /* ===== BOTÕES ===== */
+        /* Checkbox personalizado */
+        .checkbox-remember {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: var(--text2);
+            margin-bottom: 16px;
+            user-select: none;
+            transition: color 0.2s;
+        }
+        .checkbox-remember:hover {
+            color: var(--text);
+        }
+        .checkbox-remember input {
+            accent-color: var(--accent);
+            width: 17px;
+            height: 17px;
+            cursor: pointer;
+        }
+
         .btn {
             display: inline-flex;
             align-items: center;
@@ -181,9 +198,9 @@
             color: #fff;
         }
         .btn-primary:hover {
-            background: #7d6ff0;
+            background: #2563eb;
             transform: translateY(-1px);
-            box-shadow: 0 6px 24px rgba(108, 92, 231, 0.35);
+            box-shadow: 0 6px 24px var(--accent-glow);
         }
         .btn-outline {
             background: transparent;
@@ -199,14 +216,14 @@
             color: #fff;
         }
         .btn-danger:hover {
-            background: #ff7070;
+            background: #dc2626;
         }
         .btn-green {
             background: var(--green);
-            color: #000;
+            color: #05060d;
         }
         .btn-green:hover {
-            background: #00e6b0;
+            background: #059669;
         }
         .btn-sm {
             padding: 8px 14px;
@@ -221,7 +238,6 @@
             border-radius: 6px;
         }
 
-        /* ===== LINKS ===== */
         .link {
             color: var(--accent2);
             cursor: pointer;
@@ -231,7 +247,7 @@
             transition: color 0.2s;
         }
         .link:hover {
-            color: #c4bfff;
+            color: #93c5fd;
             text-decoration: underline;
         }
 
@@ -258,7 +274,6 @@
             right: 0;
         }
 
-        /* ===== TOP BAR (logado) ===== */
         .topbar {
             display: flex;
             align-items: center;
@@ -294,28 +309,28 @@
             letter-spacing: 0.3px;
         }
         .badge-admin {
-            background: rgba(240, 192, 64, 0.2);
+            background: rgba(245, 158, 11, 0.18);
             color: var(--gold);
         }
         .badge-user {
-            background: rgba(0, 210, 160, 0.15);
+            background: rgba(16, 185, 129, 0.15);
             color: var(--green);
         }
 
-        /* ===== LISTA DE PAUTAS ===== */
         .pauta-card {
             background: var(--surface2);
             border: 1px solid var(--border);
             border-radius: var(--radius-sm);
             padding: 20px;
             margin-bottom: 14px;
-            transition: border-color 0.2s, transform 0.15s;
+            transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
             cursor: pointer;
             position: relative;
         }
         .pauta-card:hover {
             border-color: var(--accent);
             transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.10);
         }
         .pauta-card h3 {
             font-size: 1.05rem;
@@ -334,6 +349,16 @@
             align-items: center;
             gap: 4px;
         }
+        .pauta-card .data-reuniao {
+            display: inline-block;
+            background: rgba(59, 130, 246, 0.12);
+            color: var(--accent2);
+            padding: 3px 9px;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            margin-bottom: 8px;
+        }
         .empty-state {
             text-align: center;
             padding: 50px 20px;
@@ -344,11 +369,11 @@
             margin-bottom: 12px;
         }
 
-        /* ===== MODAL ===== */
+        /* Modal */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.75);
             z-index: 100;
             display: flex;
             align-items: center;
@@ -408,7 +433,6 @@
             color: #fff;
         }
 
-        /* ===== CHECKBOX LIST ===== */
         .checkbox-list {
             max-height: 200px;
             overflow-y: auto;
@@ -437,7 +461,7 @@
             cursor: pointer;
         }
 
-        /* ===== TOAST ===== */
+        /* Toast */
         .toast {
             position: fixed;
             top: 20px;
@@ -447,9 +471,9 @@
             border-radius: var(--radius-sm);
             font-weight: 600;
             font-size: 0.88rem;
-            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.5s forwards;
+            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.8s forwards;
             max-width: 380px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55);
         }
         @keyframes slideIn {
             from {
@@ -468,22 +492,22 @@
             }
         }
         .toast-success {
-            background: #0d3324;
+            background: #0a2e1f;
             border: 1px solid var(--green);
             color: var(--green);
         }
         .toast-error {
-            background: #330f0f;
+            background: #2e0a0a;
             border: 1px solid var(--red);
             color: var(--red);
         }
         .toast-info {
-            background: #1a1535;
+            background: #0f172b;
             border: 1px solid var(--accent);
             color: var(--accent2);
         }
 
-        /* ===== TABS ===== */
+        /* Tabs */
         .tabs {
             display: flex;
             gap: 4px;
@@ -511,10 +535,13 @@
         }
         .tab:hover:not(.active) {
             color: #fff;
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.03);
         }
 
-        /* ===== RESPONSIVO ===== */
+        .hidden {
+            display: none !important;
+        }
+
         @media (max-width: 600px) {
             .card {
                 padding: 24px 18px;
@@ -535,10 +562,6 @@
                 gap: 2px;
             }
         }
-
-        .hidden {
-            display: none !important;
-        }
     </style>
 </head>
 <body>
@@ -556,14 +579,14 @@
         (function() {
             // ==================== BANCO DE DADOS LOCAL ====================
             const DB_KEY = 'pautas_reuniao_db';
+            const SESSION_KEY = 'pautas_saved_session';
 
             function getDB() {
                 const raw = localStorage.getItem(DB_KEY);
                 if (raw) return JSON.parse(raw);
-                // Estrutura inicial
                 const initial = {
-                    users: [], // { id, name, username, password, role: 'admin'|'user', createdAt }
-                    pautas: [], // { id, title, date, content, createdBy, allowedUsers: [userId], createdAt }
+                    users: [],
+                    pautas: [],
                     adminExists: false,
                 };
                 saveDB(initial);
@@ -574,12 +597,30 @@
                 localStorage.setItem(DB_KEY, JSON.stringify(db));
             }
 
+            function getSavedSession() {
+                const raw = localStorage.getItem(SESSION_KEY);
+                if (raw) return JSON.parse(raw);
+                return null;
+            }
+
+            function saveSession(username, password) {
+                localStorage.setItem(SESSION_KEY, JSON.stringify({
+                    username,
+                    password,
+                    remember: true,
+                }));
+            }
+
+            function clearSession() {
+                localStorage.removeItem(SESSION_KEY);
+            }
+
             function generateId() {
                 return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             }
 
-            // ==================== SESSÃO ====================
-            let currentUser = null; // objeto do usuário logado
+            // ==================== SESSÃO ATUAL ====================
+            let currentUser = null;
 
             // ==================== UTILITÁRIOS ====================
             function escapeHTML(str) {
@@ -598,13 +639,19 @@
                 return `${day}/${month}/${year} às ${hours}:${mins}`;
             }
 
+            function formatOnlyDate(dateStr) {
+                if (!dateStr) return 'Sem data';
+                const [year, month, day] = dateStr.split('-');
+                return `${day}/${month}/${year}`;
+            }
+
             function showToast(message, type = 'info') {
                 const container = document.getElementById('toastContainer');
                 const toast = document.createElement('div');
                 toast.className = `toast toast-${type}`;
                 toast.textContent = message;
                 container.appendChild(toast);
-                setTimeout(() => toast.remove(), 3000);
+                setTimeout(() => toast.remove(), 3100);
             }
 
             // ==================== RENDERIZAÇÃO ====================
@@ -621,14 +668,17 @@
             }
 
             // ==================== TELA DE LOGIN ====================
-            function renderLogin() {
+            function renderLogin(prefillUsername) {
                 currentUser = null;
                 appContainer.classList.remove('wide');
+                const savedSession = getSavedSession();
+                const usernamePrefill = prefillUsername || (savedSession ? savedSession.username : '');
+
                 render(`
                     <div class="card">
                         <img
-                            src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&h=300&fit=crop&auto=format"
-                            alt="Reunião empresarial"
+                            src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=300&fit=crop&auto=format"
+                            alt="Sala de reunião corporativa"
                             class="header-image"
                             loading="eager"
                         />
@@ -644,7 +694,7 @@
                         <div id="tabContent"></div>
                     </div>
                 `);
-                renderLoginForm();
+                renderLoginForm(usernamePrefill);
             }
 
             function switchTab(tab) {
@@ -652,21 +702,29 @@
                     t.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'register' && i ===
                         1));
                 });
-                if (tab === 'login') renderLoginForm();
+                if (tab === 'login') renderLoginForm('');
                 else renderRegisterForm();
             }
 
-            function renderLoginForm() {
+            function renderLoginForm(prefillUsername) {
+                const savedSession = getSavedSession();
+                const usernameVal = prefillUsername || (savedSession ? savedSession.username : '');
+                const rememberChecked = savedSession && savedSession.remember ? 'checked' : '';
+
                 document.getElementById('tabContent').innerHTML = `
                     <form onsubmit="handleLogin(event)" autocomplete="off">
                         <div class="form-group">
                             <label>Usuário</label>
-                            <input type="text" id="loginUser" placeholder="Seu nome de usuário" required />
+                            <input type="text" id="loginUser" placeholder="Seu nome de usuário" value="${escapeHTML(usernameVal)}" required />
                         </div>
                         <div class="form-group">
                             <label>Senha</label>
                             <input type="password" id="loginPass" placeholder="Sua senha" required />
                         </div>
+                        <label class="checkbox-remember">
+                            <input type="checkbox" id="rememberMe" ${rememberChecked} />
+                            💾 Lembrar meus dados neste dispositivo
+                        </label>
                         <button type="submit" class="btn btn-primary">Entrar no Sistema</button>
                     </form>
                 `;
@@ -697,6 +755,7 @@
                 event.preventDefault();
                 const username = document.getElementById('loginUser').value.trim();
                 const password = document.getElementById('loginPass').value.trim();
+                const rememberMe = document.getElementById('rememberMe').checked;
                 const db = getDB();
 
                 const user = db.users.find(u => u.username === username && u.password === password);
@@ -704,6 +763,14 @@
                     showToast('Usuário ou senha inválidos.', 'error');
                     return;
                 }
+
+                // Salvar ou limpar sessão conforme checkbox
+                if (rememberMe) {
+                    saveSession(username, password);
+                } else {
+                    clearSession();
+                }
+
                 currentUser = user;
                 showToast(`Bem-vindo(a), ${user.name}!`, 'success');
                 renderDashboard();
@@ -753,11 +820,12 @@
                     renderDashboard();
                 } else {
                     switchTab('login');
-                    renderLoginForm();
+                    renderLoginForm(username);
                 }
             };
 
             window.handleLogout = function() {
+                clearSession();
                 currentUser = null;
                 showToast('Sessão encerrada.', 'info');
                 renderLogin();
@@ -781,8 +849,12 @@
                     );
                 }
 
-                // Ordenar por data (mais recente primeiro)
-                pautasVisiveis.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                // Ordenar pela DATA DA REUNIÃO (campo "date"), mais recente primeiro
+                pautasVisiveis.sort((a, b) => {
+                    const dateA = a.date || '0000-00-00';
+                    const dateB = b.date || '0000-00-00';
+                    return dateB.localeCompare(dateA);
+                });
 
                 let html = `
                     <div class="card">
@@ -803,6 +875,7 @@
                             </div>
                         </div>
                         <h2 style="margin-bottom:16px;color:#fff;">📋 Pautas de Reunião</h2>
+                        <p style="color:var(--text2);font-size:0.78rem;margin-bottom:18px;">📅 Ordenado pela data da reunião (mais recente primeiro)</p>
                 `;
 
                 if (pautasVisiveis.length === 0) {
@@ -819,9 +892,10 @@
                         const criadorNome = criador ? criador.name : 'Desconhecido';
                         html += `
                             <div class="pauta-card" onclick="abrirPauta('${p.id}')">
+                                <span class="data-reuniao">📅 Reunião: ${formatOnlyDate(p.date)}</span>
                                 <h3>📌 ${escapeHTML(p.title)}</h3>
                                 <div class="meta">
-                                    <span>📅 ${formatDate(p.createdAt)}</span>
+                                    <span>🕐 Criada em: ${formatDate(p.createdAt)}</span>
                                     <span>👤 Por: ${escapeHTML(criadorNome)}</span>
                                     <span>🔒 ${p.allowedUsers.length} pessoa(s) autorizada(s)</span>
                                 </div>
@@ -859,7 +933,6 @@
                         '<p style="color:var(--text2);font-size:0.75rem;margin-top:6px;">Marque os usuários que poderão visualizar esta pauta.</p>';
                 }
 
-                // Overlay/modal inline
                 const overlay = document.createElement('div');
                 overlay.className = 'modal-overlay';
                 overlay.innerHTML = `
@@ -872,7 +945,7 @@
                                 <input type="text" id="pautaTitle" placeholder="Ex: Reunião de Planejamento Q3" required />
                             </div>
                             <div class="form-group">
-                                <label>Data da Reunião</label>
+                                <label>📅 Data da Reunião</label>
                                 <input type="date" id="pautaDate" required />
                             </div>
                             <div class="form-group">
@@ -889,12 +962,10 @@
                 `;
                 document.body.appendChild(overlay);
 
-                // Fechar ao clicar fora
                 overlay.addEventListener('click', function(e) {
                     if (e.target === overlay) overlay.remove();
                 });
 
-                // Data padrão = hoje
                 document.getElementById('pautaDate').value = new Date().toISOString().split('T')[0];
             };
 
@@ -920,7 +991,6 @@
                 db.pautas.push(novaPauta);
                 saveDB(db);
 
-                // Fechar modal
                 document.querySelector('.modal-overlay')?.remove();
                 showToast('Pauta criada com sucesso!', 'success');
                 renderDashboard();
@@ -958,9 +1028,9 @@
                         <button class="close-btn" onclick="this.closest('.modal-overlay').remove()">✕</button>
                         <h2>📌 ${escapeHTML(pauta.title)}</h2>
                         <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:16px;color:var(--text2);font-size:0.85rem;">
-                            <span>📅 Data da reunião: <strong style="color:#fff;">${pauta.date ? pauta.date.split('-').reverse().join('/') : 'Não definida'}</strong></span>
-                            <span>👤 Criado por: <strong style="color:#fff;">${escapeHTML(criadorNome)}</strong></span>
-                            <span>🕐 Registrado em: <strong style="color:#fff;">${formatDate(pauta.createdAt)}</strong></span>
+                            <span>📅 <strong style="color:#fff;">Data da reunião:</strong> ${formatOnlyDate(pauta.date)}</span>
+                            <span>👤 <strong style="color:#fff;">Criado por:</strong> ${escapeHTML(criadorNome)}</span>
+                            <span>🕐 <strong style="color:#fff;">Registrado em:</strong> ${formatDate(pauta.createdAt)}</span>
                         </div>
                         <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:20px;margin-bottom:16px;white-space:pre-wrap;line-height:1.7;font-size:0.93rem;">
                             ${escapeHTML(pauta.content)}
@@ -983,7 +1053,7 @@
                 });
             };
 
-            // ==================== EDITAR PAUTA (ADMIN - PERMISSÕES) ====================
+            // ==================== EDITAR PAUTA (ADMIN) ====================
             window.editarPauta = function(pautaId) {
                 if (!currentUser || currentUser.role !== 'admin') return;
                 const db = getDB();
@@ -991,7 +1061,6 @@
                 if (!pauta) return;
 
                 const usuarios = db.users.filter(u => u.id !== currentUser.id);
-
                 let usuariosHTML = '';
                 if (usuarios.length === 0) {
                     usuariosHTML =
@@ -1010,7 +1079,6 @@
                     usuariosHTML += '</div>';
                 }
 
-                // Fechar modal anterior
                 document.querySelector('.modal-overlay')?.remove();
 
                 const overlay = document.createElement('div');
@@ -1076,9 +1144,26 @@
 
             // ==================== INICIALIZAÇÃO ====================
             function init() {
-                // Garantir que o DB existe
                 getDB();
-                // Se já houver sessão ativa (improvável no recarregar), vai pro login
+
+                // Verificar se há sessão salva
+                const savedSession = getSavedSession();
+                if (savedSession && savedSession.remember) {
+                    const db = getDB();
+                    const user = db.users.find(
+                        u => u.username === savedSession.username && u.password === savedSession.password
+                    );
+                    if (user) {
+                        currentUser = user;
+                        showToast(`Bem-vindo de volta, ${user.name}! 👋`, 'info');
+                        renderDashboard();
+                        return;
+                    } else {
+                        // Dados salvos inválidos (usuário pode ter sido removido)
+                        clearSession();
+                    }
+                }
+
                 renderLogin();
             }
 
