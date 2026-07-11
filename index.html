@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pautas de Reunião</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+:root {
+  --primary: #1e3a8a;
+  --primary-light: #3b82f6;
+  --accent: #f59e0b;
+  --dark: #0f172a;
+  --gray: #64748b;
+  --light: #f8fafc;
+  --white: #ffffff;
+  --success: #10b981;
+  --danger: #ef4444;
+  --shadow: 0 10px 40px rgba(0,0,0,0.08);
+  --shadow-lg: 0 20px 60px rgba(0,0,0,0.15);
+}
+body {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  min-height: 100vh;
+  color: var(--dark);
+}
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(30,58,138,0.95), rgba(15,23,42,0.9)),
+              url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600') center/cover;
+}
+.auth-card {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 50px 40px;
+  width: 100%;
+  max-width: 450px;
+  box-shadow: var(--shadow-lg);
+  animation: fadeIn 0.5s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.auth-logo { text-align: center; margin-bottom: 30px; }
+.auth-logo .icon {
+  width: 70px; height: 70px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  border-radius: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 32px;
+  margin-bottom: 15px;
+  box-shadow: 0 10px 25px rgba(59,130,246,0.3);
+}
+.auth-logo h1 { font-size: 26px; color: var(--dark); font-weight: 800; letter-spacing: -0.5px; }
+.auth-logo p { color: var(--gray); font-size: 14px; margin-top: 6px; }
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--dark); margin-bottom: 6px; }
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 14px;
+  transition: all 0.2s;
+  background: var(--light);
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary-light);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(59,130,246,0.1);
+}
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  width: 100%;
+  box-shadow: 0 6px 20px rgba(59,130,246,0.3);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(59,130,246,0.4); }
+.btn-secondary { background: var(--light); color: var(--dark); border: 2px solid #e2e8f0; }
+.btn-secondary:hover { background: #e2e8f0; }
+.btn-danger { background: var(--danger); color: white; }
+.btn-sm { padding: 8px 14px; font-size: 12px; }
+.auth-switch { text-align: center; margin-top: 20px; color: var(--gray); font-size: 14px; }
+.auth-switch a { color: var(--primary-light); font-weight: 600; cursor: pointer; text-decoration: none; }
+.auth-switch a:hover { text-decoration: underline; }
+.app { display: none; min-height: 100vh; }
+.app.active { display: block; }
+.sidebar {
+  position: fixed;
+  left: 0; top: 0;
+  width: 260px;
+  height: 100vh;
+  background: linear-gradient(180deg, var(--dark) 0%, var(--primary) 100%);
+  color: white;
+  padding: 25px 0;
+  overflow-y: auto;
+  z-index: 100;
+}
+.sidebar-header {
+  padding: 0 25px 25px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sidebar-header .logo-icon {
+  width: 42px; height: 42px;
+  background: linear-gradient(135deg, var(--accent), #fbbf24);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+.sidebar-header h2 { font-size: 16px; font-weight: 700; line-height: 1.2; }
+.sidebar-header p { font-size: 11px; opacity: 0.7; margin-top: 2px; }
+.sidebar-menu { padding: 20px 15px; list-style: none; }
+.sidebar-menu li { margin-bottom: 4px; }
+.sidebar-menu a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 15px;
+  color: rgba(255,255,255,0.8);
+  text-decoration: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.sidebar-menu a:hover { background: rgba(255,255,255,0.08); color: white; }
+.sidebar-menu a.active {
+  background: rgba(255,255,255,0.12);
+  color: white;
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+.sidebar-menu i { width: 20px; text-align: center; }
+.sidebar-user {
+  position: absolute;
+  bottom: 20px;
+  left: 15px;
+  right: 15px;
+  padding: 12px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sidebar-user .avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #fbbf24);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+}
+.sidebar-user .info { flex: 1; min-width: 0; }
+.sidebar-user .name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar-user .role { font-size: 11px; opacity: 0.7; }
+.sidebar-user .logout {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.7);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+.sidebar-user .logout:hover { background: rgba(255,255,255,0.1); color: white; }
+.main-content { margin-left: 260px; padding: 30px 40px; min-height: 100vh; }
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+.page-header h1 { font-size: 28px; font-weight: 800; color: var(--dark); letter-spacing: -0.5px; }
+.page-header p { color: var(--gray); font-size: 14px; margin-top: 4px; }
+.hero-banner {
+  background: linear-gradient(135deg, rgba(30,58,138,0.92), rgba(59,130,246,0.85)),
+              url('https://images.unsplash.com/photo-1552664730-d307ca884978?w=1600') center/cover;
+  border-radius: 20px;
+  padding: 40px;
+  color: white;
+  margin-bottom: 30px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-banner h2 { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+.hero-banner p { opacity: 0.9; font-size: 15px; max-width: 600px; }
+.hero-banner .stats { display: flex; gap: 30px; margin-top: 25px; flex-wrap: wrap; }
+.hero-banner .stat {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  padding: 14px 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.hero-banner .stat-value { font-size: 24px; font-weight: 800; }
+.hero-banner .stat-label { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+.pautas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+.pauta-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: all 0.3s;
+  cursor: pointer;
+  border: 1px solid #e2e8f0;
+}
+.pauta-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.pauta-card .card-img { height: 140px; background-size: cover; background-position: center; position: relative; }
+.pauta-card .card-img::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.6)); }
+.pauta-card .card-date {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary);
+  z-index: 1;
+}
+.pauta-card .card-body { padding: 20px; }
+.pauta-card .card-title { font-size: 17px; font-weight: 700; color: var(--dark); margin-bottom: 8px; line-height: 1.3; }
+.pauta-card .card-desc { color: var(--gray); font-size: 13px; line-height: 1.5; margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.pauta-card .card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid #f1f5f9; }
+.pauta-card .card-author { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--gray); }
+.pauta-card .card-author .mini-avatar {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+.badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.badge-info { background: #dbeafe; color: var(--primary); }
+.badge-success { background: #d1fae5; color: var(--success); }
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.active { display: flex; }
+.modal {
+  background: white;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: fadeIn 0.3s ease;
+}
+.modal-header {
+  padding: 25px 30px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  background: white;
+  border-radius: 20px 20px 0 0;
+  z-index: 1;
+}
+.modal-header h3 { font-size: 20px; font-weight: 700; }
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: var(--gray);
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+.modal-close:hover { background: #f1f5f9; color: var(--dark); }
+.modal-body { padding: 25px 30px; }
+.pauta-detail-img { height: 220px; background-size: cover; background-position: center; border-radius: 12px; margin-bottom: 20px; }
+.pauta-detail-meta { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; color: var(--gray); font-size: 13px; }
+.pauta-detail-meta span { display: flex; align-items: center; gap: 6px; }
+.pauta-detail-content {
+  background: var(--light);
+  padding: 20px;
+  border-radius: 12px;
+  line-height: 1.7;
+  color: var(--dark);
+  white-space: pre-wrap;
+  font-size: 14px;
+}
+.users-table { background: white; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); }
+.users-table table { width: 100%; border-collapse: collapse; }
+.users-table th { background: var(--light); padding: 14px 20px; text-align: left; font-size: 12px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; }
+.users-table td { padding: 16px 20px; border-top: 1px solid #f1f5f9; font-size: 14px; }
+.users-table tr:hover { background: #fafbfc; }
+.user-cell { display: flex; align-items: center; gap: 10px; }
+.user-cell .avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+}
+.checkbox-list { max-height: 250px; overflow-y: auto; border: 2px solid #e2e8f0; border-radius: 10px; padding: 10px; }
+.checkbox-item { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+.checkbox-item:hover { background: var(--light); }
+.checkbox-item input { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary); }
+.checkbox-item label { cursor: pointer; flex: 1; font-size: 14px; }
+.alert { padding: 12px 16px; border-radius: 10px; margin-bottom: 15px; font-size: 13px; display: flex; align-items: center; gap: 10px; }
+.alert-info { background: #dbeafe; color: var(--primary); }
+.alert-danger { background: #fee2e2; color: var(--danger); }
+.alert-success { background: #d1fae5; color: var(--success); }
+.empty-state { text-align: center; padding: 60px 20px; color: var(--gray); }
+.empty-state i { font-size: 60px; margin-bottom: 20px; opacity: 0.3; }
+.empty-state h3 { font-size: 18px; margin-bottom: 8px; color: var(--dark); }
+.toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: var(--dark);
+  color: white;
+  padding: 14px 22px;
+  border-radius: 10px;
+  box-shadow: var(--shadow-lg);
+  z-index: 2000;
+  animation: slideIn 0.3s ease;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+  .sidebar.open { transform: translateX(0); }
+  .main-content { margin-left: 0; padding: 20px; }
+  .mobile-toggle { display: block !important; }
+  .pautas-grid { grid-template-columns: 1fr; }
+}
+.mobile-toggle {
+  display: none;
+  position: fixed;
+  top: 15px; left: 15px;
+  z-index: 200;
+  background: var(--primary);
+  color: white;
+  border: none;
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+</style>
+</head>
+<body>
+
+<div id="loginScreen" class="auth-container">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="icon"><i class="fas fa-briefcase"></i></div>
+      <h1>Pautas de Reunião</h1>
+      <p>Acesse sua conta para continuar</p>
+    </div>
+    <form id="loginForm">
+      <div class="form-group">
+        <label>Usuário</label>
+        <input type="text" id="loginUser" placeholder="Digite seu usuário" required>
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="loginPass" placeholder="Digite sua senha" required>
+      </div>
+      <div id="loginError" class="alert alert-danger" style="display:none;">
+        <i class="fas fa-exclamation-circle"></i>
+        <span>Usuário ou senha incorretos</span>
+      </div>
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-sign-in-alt"></i> Entrar
+      </button>
+    </form>
+    <div class="auth-switch">
+      Não tem conta? <a onclick="showRegister()">Cadastre-se</a>
+    </div>
+  </div>
+</div>
+
+<div id="registerScreen" class="auth-container" style="display:none;">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="icon"><i class="fas fa-user-plus"></i></div>
+      <h1>Criar Conta</h1>
+      <p>Preencha os dados para se cadastrar</p>
+    </div>
+    <form id="registerForm">
+      <div class="form-group">
+        <label>Nome Completo</label>
+        <input type="text" id="regName" placeholder="Seu nome" required>
+      </div>
+      <div class="form-group">
+        <label>Usuário</label>
+        <input type="text" id="regUser" placeholder="Escolha um usuário" required>
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="regPass" placeholder="Mínimo 4 caracteres" required minlength="4">
+      </div>
+      <div id="regError" class="alert alert-danger" style="display:none;"></div>
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-check"></i> Criar Conta
+      </button>
+    </form>
+    <div class="auth-switch">
+      Já tem conta? <a onclick="showLogin()">Fazer login</a>
+    </div>
+  </div>
+</div>
+
+<div id="app" class="app">
+  <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-icon"><i class="fas fa-briefcase"></i></div>
+      <div>
+        <h2>Pautas de Reunião</h2>
+        <p>Sistema Corporativo</p>
+      </div>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a class="active" data-page="dashboard" onclick="navigate('dashboard')"><i class="fas fa-home"></i> Início</a></li>
+      <li><a data-page="pautas" onclick="navigate('pautas')"><i class="fas fa-file-alt"></i> Minhas Pautas</a></li>
+      <li id="menuNewPauta" style="display:none;"><a data-page="nova" onclick="navigate('nova')"><i class="fas fa-plus-circle"></i> Nova Pauta</a></li>
+      <li id="menuAdmin" style="display:none;"><a data-page="admin" onclick="navigate('admin')"><i class="fas fa-users-cog"></i> Administrar Usuários</a></li>
+    </ul>
+    <div class="sidebar-user">
+      <div class="avatar" id="userAvatar">U</div>
+      <div class="info">
+        <div class="name" id="userName">Usuário</div>
+        <div class="role" id="userRole">Colaborador</div>
+      </div>
+      <button class="logout" onclick="logout()" title="Sair"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div id="page-dashboard" class="page">
+      <div class="hero-banner">
+        <h2>Bem-vindo ao sistema de Pautas!</h2>
+        <p>Organize, acesse e gerencie todas as pautas de reunião da empresa em um só lugar, com total controle de permissões.</p>
+        <div class="stats">
+          <div class="stat"><div class="stat-value" id="statPautas">0</div><div class="stat-label">Pautas disponíveis</div></div>
+          <div class="stat"><div class="stat-value" id="statUsers">0</div><div class="stat-label">Usuários cadastrados</div></div>
+          <div class="stat"><div class="stat-value" id="statToday">0</div><div class="stat-label">Criadas este mês</div></div>
+        </div>
+      </div>
+      <div class="page-header">
+        <div><h1>Pautas Recentes</h1><p>Últimas pautas que você tem acesso</p></div>
+        <button class="btn btn-primary" id="btnNewPautaTop" onclick="navigate('nova')" style="display:none;"><i class="fas fa-plus"></i> Nova Pauta</button>
+      </div>
+      <div id="dashboardPautas" class="pautas-grid"></div>
+    </div>
+
+    <div id="page-pautas" class="page" style="display:none;">
+      <div class="page-header"><div><h1>Minhas Pautas</h1><p>Todas as pautas que você tem permissão para visualizar</p></div></div>
+      <div id="allPautas" class="pautas-grid"></div>
+    </div>
+
+    <div id="page-nova" class="page" style="display:none;">
+      <div class="page-header"><div><h1>Nova Pauta de Reunião</h1><p>Preencha os dados e defina quem poderá visualizar</p></div></div>
+      <div style="background:white; border-radius:16px; padding:30px; box-shadow:var(--shadow);">
+        <form id="pautaForm">
+          <div class="form-group"><label>Título da Reunião</label><input type="text" id="pTitulo" placeholder="Ex: Planejamento Q3 2026" required></div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+            <div class="form-group"><label>Data da Reunião</label><input type="date" id="pData" required></div>
+            <div class="form-group"><label>Horário</label><input type="time" id="pHora" required></div>
+          </div>
+          <div class="form-group"><label>Local / Link</label><input type="text" id="pLocal" placeholder="Ex: Sala de Reuniões A / Google Meet" required></div>
+          <div class="form-group"><label>Participantes Presenciais</label><input type="text" id="pParticipantes" placeholder="Ex: João, Maria, Pedro"></div>
+          <div class="form-group"><label>Pauta / Assuntos da Reunião</label><textarea id="pConteudo" rows="8" placeholder="Descreva os assuntos a serem tratados..." required style="resize:vertical;"></textarea></div>
+          <div class="form-group"><label>Permitir visualização para:</label><div class="checkbox-list" id="pUsuarios"></div></div>
+          <div style="display:flex; gap:10px; justify-content:flex-end;">
+            <button type="button" class="btn btn-secondary" onclick="navigate('dashboard')">Cancelar</button>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Pauta</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="page-admin" class="page" style="display:none;">
+      <div class="page-header"><div><h1>Administrador</h1><p>Gerencie usuários, permissões e pautas do sistema</p></div></div>
+      <div class="alert alert-info"><i class="fas fa-info-circle"></i><span>Como administrador, você pode gerenciar todos os usuários e pautas do sistema.</span></div>
+      <h3 style="margin-bottom:15px; font-size:16px;">Usuários Cadastrados</h3>
+      <div class="users-table">
+        <table>
+          <thead><tr><th>Usuário</th><th>Nome</th><th>Tipo</th><th>Ações</th></tr></thead>
+          <tbody id="usersTableBody"></tbody>
+        </table>
+      </div>
+      <h3 style="margin:30px 0 15px; font-size:16px;">Todas as Pautas</h3>
+      <div id="adminPautas" class="pautas-grid"></div>
+    </div>
+  </main>
+</div>
+
+<div class="modal-overlay" id="modalDetail">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="detailTitle">Detalhes</h3>
+      <button class="modal-close" onclick="closeModal('modalDetail')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+  </div>
+</div>
+
+<script>
+const IMAGES = [
+  'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800',
+  'https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=800',
+  'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800',
+  'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800',
+  'https://images.unsplash.com/photo-1600880292203-757bb62b6b99?w=800',
+  'https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=800',
+  'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800',
+  'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800'
+];
+
+function initData() {
+  if (!localStorage.getItem('pautas_users')) {
+    const admin = { username: 'admin', password: 'admin123', name: 'Administrador', role: 'admin' };
+    localStorage.setItem('pautas_users', JSON.stringify([admin]));
+  }
+  if (!localStorage.getItem('pautas_list')) {
+    localStorage.setItem('pautas_list', JSON.stringify([]));
+  }
+}
+
+function getUsers() { return JSON.parse(localStorage.getItem('pautas_users') || '[]'); }
+function setUsers(u) { localStorage.setItem('pautas_users', JSON.stringify(u)); }
+function getPautas() { return JSON.parse(localStorage.getItem('pautas_list') || '[]'); }
+function setPautas(p) { localStorage.setItem('pautas_list', JSON.stringify(p)); }
+function getCurrentUser() { return JSON.parse(localStorage.getItem('pautas_current') || 'null'); }
+function setCurrentUser(u) { localStorage.setItem('pautas_current', JSON.stringify(u)); }
+
+function showLogin() {
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('registerScreen').style.display = 'none';
+}
+function showRegister() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('registerScreen').style.display = 'flex';
+}
+
+document.getElementById('loginForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const users = getUsers();
+  const found = users.find(u => u.username === user && u.password === pass);
+  if (found) {
+    setCurrentUser(found);
+    document.getElementById('loginError').style.display = 'none';
+    enterApp();
+  } else {
+    document.getElementById('loginError').style.display = 'flex';
+  }
+});
+
+document.getElementById('registerForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = document.getElementById('regName').value.trim();
+  const user = document.getElementById('regUser').value.trim();
+  const pass = document.getElementById('regPass').value;
+  const err = document.getElementById('regError');
+  const users = getUsers();
+  if (users.find(u => u.username === user)) {
+    err.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>Usuário já existe</span>';
+    err.style.display = 'flex';
+    return;
+  }
+  users.push({ username: user, password: pass, name: name, role: 'user' });
+  setUsers(users);
+  err.innerHTML = '<i class="fas fa-check-circle"></i><span>Conta criada! Faça login.</span>';
+  err.className = 'alert alert-success';
+  err.style.display = 'flex';
+  setTimeout(() => { showLogin(); err.style.display = 'none'; err.className = 'alert alert-danger'; }, 1500);
+});
+
+function logout() {
+  localStorage.removeItem('pautas_current');
+  document.getElementById('app').classList.remove('active');
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+}
+
+function enterApp() {
+  const user = getCurrentUser();
+  if (!user) return;
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').classList.add('active');
+  document.getElementById('userName').textContent = user.name;
+  document.getElementById('userRole').textContent = user.role === 'admin' ? 'Administrador' : 'Colaborador';
+  document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
+  if (user.role === 'admin') {
+    document.getElementById('menuAdmin').style.display = 'block';
+    document.getElementById('menuNewPauta').style.display = 'block';
+    document.getElementById('btnNewPautaTop').style.display = 'inline-flex';
+  } else {
+    document.getElementById('menuAdmin').style.display = 'none';
+    document.getElementById('menuNewPauta').style.display = 'none';
+    document.getElementById('btnNewPautaTop').style.display = 'none';
+  }
+  navigate('dashboard');
+}
+
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+  document.getElementById('page-' + page).style.display = 'block';
+  document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+  const link = document.querySelector(`.sidebar-menu a[data-page="${page}"]`);
+  if (link) link.classList.add('active');
+  if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
+  if (page === 'dashboard') renderDashboard();
+  if (page === 'pautas') renderPautas();
+  if (page === 'nova') renderNewPautaForm();
+  if (page === 'admin') renderAdmin();
+}
+
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+function renderDashboard() {
+  const user = getCurrentUser();
+  const pautas = getPautas();
+  const users = getUsers();
+  const myPautas = user.role === 'admin' ? pautas : pautas.filter(p => p.allowed.includes(user.username));
+  const now = new Date();
+  const thisMonth = pautas.filter(p => { const d = new Date(p.createdAt); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); }).length;
+  document.getElementById('statPautas').textContent = myPautas.length;
+  document.getElementById('statUsers').textContent = users.length;
+  document.getElementById('statToday').textContent = thisMonth;
+  renderPautaCards(myPautas.slice(0, 6), 'dashboardPautas');
+}
+
+function renderPautas() {
+  const user = getCurrentUser();
+  const pautas = getPautas();
+  const myPautas = user.role === 'admin' ? pautas : pautas.filter(p => p.allowed.includes(user.username));
+  renderPautaCards(myPautas, 'allPautas');
+}
+
+function renderPautaCards(pautas, containerId) {
+  const container = document.getElementById(containerId);
+  if (pautas.length === 0) {
+    container.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-folder-open"></i><h3>Nenhuma pauta disponível</h3><p>Ainda não há pautas para exibir.</p></div>';
+    return;
+  }
+  container.innerHTML = pautas.map((p, i) => {
+    const img = p.image || IMAGES[i % IMAGES.length];
+    const date = new Date(p.date).toLocaleDateString('pt-BR');
+    const author = getUsers().find(u => u.username === p.author)?.name || p.author;
+    const initials = author.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase();
+    return '<div class="pauta-card" onclick="openDetail(\'' + p.id + '\')"><div class="card-img" style="background-image:url(\'' + img + '\')"><div class="card-date"><i class="far fa-calendar"></i> ' + date + '</div></div><div class="card-body"><div class="card-title">' + escapeHtml(p.title) + '</div><div class="card-desc">' + escapeHtml(p.content) + '</div><div class="card-footer"><div class="card-author"><div class="mini-avatar">' + initials + '</div><span>' + escapeHtml(author) + '</span></div><span class="badge badge-info"><i class="far fa-clock"></i> ' + p.time + '</span></div></div></div>';
+  }).join('');
+}
+
+function openDetail(id) {
+  const p = getPautas().find(x => x.id === id);
+  if (!p) return;
+  const img = p.image || IMAGES[0];
+  const author = getUsers().find(u => u.username === p.author)?.name || p.author;
+  const allowedNames = p.allowed.map(u => getUsers().find(x => x.username === u)?.name || u).join(', ');
+  document.getElementById('detailTitle').textContent = p.title;
+  document.getElementById('detailBody').innerHTML = '<div class="pauta-detail-img" style="background-image:url(\'' + img + '\')"></div><div class="pauta-detail-meta"><span><i class="far fa-calendar"></i> ' + new Date(p.date).toLocaleDateString('pt-BR') + '</span><span><i class="far fa-clock"></i> ' + p.time + '</span><span><i class="fas fa-map-marker-alt"></i> ' + escapeHtml(p.location) + '</span><span><i class="fas fa-user"></i> ' + escapeHtml(author) + '</span></div>' + (p.participants ? '<p style="margin-bottom:15px;"><strong>Participantes:</strong> ' + escapeHtml(p.participants) + '</p>' : '') + '<h4 style="margin-bottom:10px; font-size:15px;">Pauta da Reunião</h4><div class="pauta-detail-content">' + escapeHtml(p.content) + '</div><p style="margin-top:20px; font-size:12px; color:var(--gray);"><strong>Visível para:</strong> ' + escapeHtml(allowedNames) + '</p>';
+  document.getElementById('modalDetail').classList.add('active');
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+function renderNewPautaForm() {
+  const users = getUsers().filter(u => u.role !== 'admin');
+  const container = document.getElementById('pUsuarios');
+  if (users.length === 0) {
+    container.innerHTML = '<p style="padding:10px; color:var(--gray); font-size:13px;">Nenhum usuário cadastrado ainda.</p>';
+  } else {
+    container.innerHTML = users.map(u => '<div class="checkbox-item"><input type="checkbox" id="u_' + u.username + '" value="' + u.username + '"><label for="u_' + u.username + '">' + escapeHtml(u.name) + ' <small style="color:var(--gray);">(' + u.username + ')</small></label></div>').join('');
+  }
+}
+
+document.getElementById('pautaForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const user = getCurrentUser();
+  const allowed = Array.from(document.querySelectorAll('#pUsuarios input:checked')).map(i => i.value);
+  const pauta = {
+    id: 'p_' + Date.now(),
+    title: document.getElementById('pTitulo').value,
+    date: document.getElementById('pData').value,
+    time: document.getElementById('pHora').value,
+    location: document.getElementById('pLocal').value,
+    participants: document.getElementById('pParticipantes').value,
+    content: document.getElementById('pConteudo').value,
+    allowed: allowed,
+    author: user.username,
+    createdAt: new Date().toISOString(),
+    image: IMAGES[Math.floor(Math.random() * IMAGES.length)]
+  };
+  const pautas = getPautas();
+  pautas.unshift(pauta);
+  setPautas(pautas);
+  showToast('Pauta criada com sucesso!');
+  document.getElementById('pautaForm').reset();
+  navigate('dashboard');
+});
+
+function renderAdmin() {
+  const users = getUsers();
+  const tbody = document.getElementById('usersTableBody');
+  tbody.innerHTML = users.map(u => {
+    const initials = u.name.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase();
+    return '<tr><td><div class="user-cell"><div class="avatar">' + initials + '</div><div><strong>' + escapeHtml(u.name) + '</strong><br><small style="color:var(--gray);">@' + u.username + '</small></div></div></td><td>' + escapeHtml(u.name) + '</td><td><span class="badge ' + (u.role==='admin'?'badge-success':'badge-info') + '">' + (u.role==='admin'?'Admin':'Usuário') + '</span></td><td>' + (u.role !== 'admin' ? '<button class="btn btn-sm btn-secondary" onclick="toggleRole(\'' + u.username + '\')"><i class="fas fa-user-shield"></i> ' + (u.role==='admin'?'Remover Admin':'Tornar Admin') + '</button> <button class="btn btn-sm btn-danger" onclick="deleteUser(\'' + u.username + '\')"><i class="fas fa-trash"></i></button>' : '<span style="color:var(--gray); font-size:12px;">Protegido</span>') + '</td></tr>';
+  }).join('');
+  renderPautaCards(getPautas(), 'adminPautas');
+}
+
+function toggleRole(username) {
+  const users = getUsers();
+  const u = users.find(x => x.username === username);
+  if (u) { u.role = u.role === 'admin' ? 'user' : 'admin'; setUsers(users); renderAdmin(); showToast('Permissão alterada!'); }
+}
+
+function deleteUser(username) {
+  if (!confirm('Deseja realmente excluir este usuário?')) return;
+  const users = getUsers().filter(u => u.username !== username);
+  setUsers(users);
+  renderAdmin();
+  showToast('Usuário excluído!');
+}
+
+function escapeHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = '<i class="fas fa-check-circle" style="color:var(--success);"></i> ' + msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+initData();
+if (getCurrentUser()) { enterApp(); }
+</script>
+</body>
+</html>
