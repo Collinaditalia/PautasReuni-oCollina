@@ -6,10 +6,8 @@
     <title>Pautas de Reunião</title>
 
     <!-- ========== FIREBASE SDK ========== -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js">
-    </script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js">
-    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 
     <!-- ========== ESTILOS ========== -->
     <style>
@@ -575,20 +573,17 @@
     <script>
         (function() {
             // ==================== CONFIGURAÇÃO DO FIREBASE ====================
-            // ⚠️ SUBSTITUA com os dados do SEU projeto Firebase:
-            //    1. Acesse https://console.firebase.google.com/
-            //    2. Crie um projeto (ou use um existente)
-            //    3. Vá em "Configurações do Projeto" > "Seus aplicativos" > "App da Web"
-            //    4. Copie o objeto firebaseConfig abaixo
+            // ✅ CREDENCIAIS ATUALIZADAS - Projeto: pautareuniao-d94f6
 
             const firebaseConfig = {
-                apiKey: "AIzaSyEXEMPLO-REPLACE-WITH-YOUR-KEY",
-                authDomain: "SEU-PROJETO.firebaseapp.com",
-                databaseURL: "https://SEU-PROJETO-default-rtdb.firebaseio.com",
-                projectId: "SEU-PROJETO",
-                storageBucket: "SEU-PROJETO.appspot.com",
-                messagingSenderId: "000000000000",
-                appId: "1:000000000000:web:xxxxxxxxxxxxxxxxxxxx"
+                apiKey: "AIzaSyGN0Hry8Vgctui8aVQhEfaRDXBdLRPtfYE",
+                authDomain: "pautareuniao-d94f6.firebaseapp.com",
+                databaseURL: "https://pautareuniao-d94f6-default-rtdb.firebaseio.com",
+                projectId: "pautareuniao-d94f6",
+                storageBucket: "pautareuniao-d94f6.firebasestorage.app",
+                messagingSenderId: "5682239227",
+                appId: "1:5682239227:web:2138a8250ed0f93ae7825e",
+                measurementId: "G-16GQWMS3H1"
             };
 
             // Inicializa Firebase
@@ -603,7 +598,6 @@
             // ==================== SESSÃO ====================
             let currentUser = null;
 
-            // Persiste sessão no sessionStorage (sobrevive a refresh, mas não a fechar o navegador)
             function saveSession(user) {
                 currentUser = user;
                 sessionStorage.setItem('currentUserId', user.id);
@@ -657,7 +651,6 @@
                 return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             }
 
-            // Converte objeto do Firebase em array
             function objToArray(obj) {
                 if (!obj) return [];
                 return Object.values(obj);
@@ -705,8 +698,7 @@
 
             window.switchTab = function(tab) {
                 document.querySelectorAll('#loginTabs .tab').forEach((t, i) => {
-                    t.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'register' && i ===
-                        1));
+                    t.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'register' && i === 1));
                 });
                 if (tab === 'login') renderLoginForm();
                 else renderRegisterForm();
@@ -778,11 +770,9 @@
                     return;
                 }
 
-                // Verifica se já existe admin (primeiro usuário do sistema)
                 const configSnapshot = await configRef.child('adminExists').once('value');
                 const adminExists = configSnapshot.val() === true;
 
-                // Verifica se usuário já existe
                 const usersSnapshot = await usersRef.once('value');
                 const users = objToArray(usersSnapshot.val());
                 if (users.find(u => u.username === username)) {
@@ -802,7 +792,6 @@
                     createdAt: new Date().toISOString(),
                 };
 
-                // Salva no Firebase
                 await usersRef.child(newUser.id).set(newUser);
                 if (isFirstUser) {
                     await configRef.child('adminExists').set(true);
@@ -833,7 +822,6 @@
             // ==================== DASHBOARD ====================
             async function renderDashboard() {
                 if (!currentUser) {
-                    // Tenta restaurar sessão
                     const restored = await restoreSession();
                     if (!restored) {
                         renderLogin();
@@ -841,7 +829,6 @@
                     }
                 }
 
-                // Recarrega dados atualizados do Firebase
                 const usersSnapshot = await usersRef.once('value');
                 const allUsers = objToArray(usersSnapshot.val());
 
@@ -855,12 +842,10 @@
                     pautasVisiveis = allPautas;
                 } else {
                     pautasVisiveis = allPautas.filter(p =>
-                        (p.allowedUsers && p.allowedUsers.includes(currentUser.id)) || p.createdBy ===
-                        currentUser.id
+                        (p.allowedUsers && p.allowedUsers.includes(currentUser.id)) || p.createdBy === currentUser.id
                     );
                 }
 
-                // Ordenar por data (mais recente primeiro)
                 pautasVisiveis.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
                 let html = `
@@ -995,7 +980,6 @@
                     createdAt: new Date().toISOString(),
                 };
 
-                // Salva no Firebase
                 await pautasRef.child(novaPauta.id).set(novaPauta);
 
                 document.querySelector('.modal-overlay')?.remove();
@@ -1089,8 +1073,7 @@
                 } else {
                     usuariosHTML = '<div class="checkbox-list">';
                     usuarios.forEach(u => {
-                        const checked = pauta.allowedUsers && pauta.allowedUsers.includes(u.id) ? 'checked' :
-                            '';
+                        const checked = pauta.allowedUsers && pauta.allowedUsers.includes(u.id) ? 'checked' : '';
                         usuariosHTML += `
                             <label class="checkbox-item">
                                 <input type="checkbox" value="${u.id}" class="perm-check-edit" ${checked} />
@@ -1150,7 +1133,6 @@
             // ==================== INICIALIZAÇÃO ====================
             async function init() {
                 try {
-                    // Tenta restaurar sessão anterior
                     const hasSession = await restoreSession();
                     if (hasSession) {
                         await renderDashboard();
