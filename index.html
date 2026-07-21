@@ -9,6 +9,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 
+<!-- SDK EmailJS v3 -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root {
@@ -175,6 +178,30 @@ body {
 }
 .pauta-card:hover { border-color: var(--accent); transform: translateY(-2px); }
 .pauta-card h3 { font-size: 1.05rem; color: #fff; margin-bottom: 8px; }
+
+/* Estilo para pauta expandida (aberta) */
+.pauta-card-expanded {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  margin-bottom: 16px;
+  transition: border-color 0.2s;
+}
+.pauta-card-expanded:hover { border-color: var(--accent); }
+.pauta-card-expanded h3 { font-size: 1.1rem; color: #fff; margin-bottom: 6px; }
+.pauta-content-display {
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 12px 0;
+  white-space: pre-wrap;
+  line-height: 1.7;
+  font-size: 0.93rem;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
 .meta {
   display: flex;
   flex-wrap: wrap;
@@ -331,6 +358,38 @@ body {
 
 <script>
 (function() {
+  // ============================================
+  // CONFIGURAÇÃO DE EMAIL (EmailJS)
+  // ============================================
+  // Para habilitar o envio de emails:
+  // 1. Crie uma conta em https://www.emailjs.com/
+  // 2. Adicione um serviço de email (Gmail, Outlook, etc.)
+  // 3. Crie um template de email com as variáveis:
+  //    {{to_email}}, {{to_name}}, {{pauta_title}},
+  //    {{pauta_date}}, {{creator_name}}, {{pauta_content}}
+  // 4. Substitua os valores abaixo pela sua chave pública,
+  //    Service ID e Template ID do EmailJS
+  // Deixe como está se não quiser configurar emails agora —
+  // o sistema funcionará normalmente, apenas sem enviar emails.
+  const emailConfig = {
+    publicKey: 'SEU_EMAILJS_PUBLIC_KEY',
+    serviceId: 'SEU_SERVICE_ID',
+    templateId: 'SEU_TEMPLATE_ID',
+  };
+
+  function isEmailConfigured() {
+    return typeof emailjs !== 'undefined' &&
+           emailConfig.publicKey &&
+           emailConfig.publicKey !== 'SEU_EMAILJS_PUBLIC_KEY' &&
+           emailConfig.serviceId !== 'SEU_SERVICE_ID' &&
+           emailConfig.templateId !== 'SEU_TEMPLATE_ID';
+  }
+
+  // Inicializa EmailJS se configurado
+  if (isEmailConfigured()) {
+    emailjs.init(emailConfig.publicKey);
+  }
+
   const firebaseConfig = {
     apiKey: "AIzaSyGN0Hry8Vgctui8aVQhEfaRDXBdLRPtfYE",
     authDomain: "pautareuniao-d94f6.firebaseapp.com",
@@ -402,6 +461,64 @@ body {
     if (!obj) return [];
     return Object.values(obj);
   }
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  // ============ ENVIO DE EMAIL ============
+  async function sendEmailToAllowedUsers(pauta, allowedUserIds) {
+    if (!isEmailConfigured()) {
+      console.log('ℹ️ EmailJS não configurado — email não enviado.');
+      return;
+    }
+    if (!allowedUserIds || allowedUserIds.length === 0) {
+      console.log('ℹ️ Nenhum destinatário selecionado — email não enviado.');
+      return;
+    }
+    try {
+      const snap = await usersRef.once('value');
+      const allUsers = objToArray(snap.val());
+      const creator = allUsers.find(u => u.id === pauta.createdBy);
+      const creatorName = creator ? creator.name : 'Desconhecido';
+
+      const recipients = allUsers.filter(u =>
+        allowedUserIds.includes(u.id) && u.email && isValidEmail(u.email)
+      );
+
+      if (recipients.length === 0) {
+        console.log('ℹ️ Nenhum destinatário com e-mail válido — email não enviado.');
+        return;
+      }
+
+      let enviados = 0;
+      for (const recipient of recipients) {
+        try {
+          await emailjs.send(
+            emailConfig.serviceId,
+            emailConfig.templateId,
+            {
+              to_email: recipient.email,
+              to_name: recipient.name,
+              pauta_title: pauta.title,
+              pauta_date: formatDateBR(pauta.date),
+              creator_name: creatorName,
+              pauta_content: pauta.content,
+            },
+            emailConfig.publicKey
+          );
+          enviados++;
+        } catch (err) {
+          console.error('Erro ao enviar email para ' + recipient.email, err);
+        }
+      }
+      if (enviados > 0) {
+        console.log(`✅ Emails enviados para ${enviados} destinatário(s).`);
+        showToast(`📧 Email enviado para ${enviados} responsável(is)!`, 'success');
+      }
+    } catch (error) {
+      console.error('Erro geral ao enviar emails:', error);
+    }
+  }
 
   const appContainer = document.getElementById('appContainer');
 
@@ -428,8 +545,8 @@ body {
           <p>Gerencie e acesse pautas corporativas</p>
         </div>
         <div class="tabs" id="loginTabs">
-          <button class="tab active" onclick="switchTab('login')"> Entrar</button>
-          <button class="tab" onclick="switchTab('register')"> Cadastrar</button>
+          <button class="tab active" onclick="switchTab('login')">🔑 Entrar</button>
+          <button class="tab" onclick="switchTab('register')">📝 Cadastrar</button>
         </div>
         <div id="tabContent"></div>
       </div>
@@ -469,6 +586,10 @@ body {
           <input type="text" id="regName" placeholder="Ex: João Silva" required />
         </div>
         <div class="form-group">
+          <label>E-mail</label>
+          <input type="email" id="regEmail" placeholder="Ex: joao@empresa.com" required />
+        </div>
+        <div class="form-group">
           <label>Nome de usuário</label>
           <input type="text" id="regUser" placeholder="Ex: joao.silva" required />
         </div>
@@ -497,19 +618,35 @@ body {
   window.handleRegister = async function(e) {
     e.preventDefault();
     const nome = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
     const usern = document.getElementById('regUser').value.trim();
     const pass = document.getElementById('regPass').value.trim();
+
+    if (!isValidEmail(email)) {
+      showToast('Por favor, informe um e-mail válido.','error');
+      return;
+    }
     if (pass.length < 4) { showToast('A senha deve ter pelo menos 4 caracteres.','error'); return; }
+
     const cSnap = await configRef.child('adminExists').once('value');
     const adminExists = cSnap.val() === true;
     const uSnap = await usersRef.once('value');
     const usuarios = objToArray(uSnap.val());
-    if (usuarios.find(u => u.username === usern)) { showToast('Este nome de usuário já está em uso.','error'); return; }
+    if (usuarios.find(u => u.username === usern)) {
+      showToast('Este nome de usuário já está em uso.','error');
+      return;
+    }
+    if (usuarios.find(u => u.email && u.email.toLowerCase() === email.toLowerCase())) {
+      showToast('Este e-mail já está cadastrado.','error');
+      return;
+    }
+
     const primeiro = !adminExists;
     const role = primeiro ? 'admin' : 'user';
     const novoUser = {
       id: generateId(),
       name: nome,
+      email: email,
       username: usern,
       password: pass,
       role,
@@ -540,7 +677,6 @@ body {
     const allP = objToArray(snapP.val());
     const isAdmin = currentUser.role === 'admin';
 
-    // Filtrar pautas
     const pendentes = allP.filter(p => p.status === 'pending');
     const ativas = allP.filter(p => p.status === 'active');
 
@@ -583,12 +719,11 @@ body {
         <div class="tabs" id="dashTabs" style="margin-bottom:20px;">
           <button class="tab-dash active" onclick="switchDashTab('disponiveis', ${ativas.length})">📋 Ativas <span class="count">${ativas.length}</span></button>
           <button class="tab-dash" onclick="switchDashTab('pendentes', ${qtdPendentes})">⏳ Pendentes <span class="count">${qtdPendentes}</span></button>
-          <button class="tab-dash" onclick="switchDashTab('todas', ${allP.length})"> Todas <span class="count">${allP.length}</span></button>
+          <button class="tab-dash" onclick="switchDashTab('todas', ${allP.length})">📂 Todas <span class="count">${allP.length}</span></button>
         </div>
         <div id="dashContent"></div>
       `;
       renderWide(html);
-      // ✅ CORRIGIDO: _dashData definido ANTES de chamar switchDashTab
       window._dashData = { ativas, pendentes, allP, allU, isAdmin };
       switchDashTab('disponiveis', ativas.length);
     } else {
@@ -600,7 +735,6 @@ body {
         <div id="dashContent"></div>
       `;
       renderWide(html);
-      // ✅ CORRIGIDO: _dashDataUser definido ANTES de chamar switchDashTabUser
       window._dashDataUser = { pautasDisponiveis, minhasPautas, allU, isAdmin };
       switchDashTabUser('disponiveis');
     }
@@ -608,7 +742,7 @@ body {
     html += `</div>`;
   }
 
-  // Abas do Admin
+  // ============ ABAS DO ADMIN ============
   window.switchDashTab = function(tab, count) {
     document.querySelectorAll('#dashTabs .tab-dash').forEach(el => el.classList.remove('active'));
     event.target.closest('.tab-dash').classList.add('active');
@@ -629,7 +763,7 @@ body {
     }
   }
 
-  // Abas do Usuário
+  // ============ ABAS DO USUÁRIO ============
   window.switchDashTabUser = function(tab) {
     document.querySelectorAll('#dashTabs .tab-dash').forEach(el => el.classList.remove('active'));
     event.target.closest('.tab-dash').classList.add('active');
@@ -644,34 +778,80 @@ body {
     }
   }
 
+  // ============ RENDERIZAÇÃO DE PAUTAS (EXPANDIDAS) ============
   function renderPautasList(pautas, allU, isAdmin, mode) {
     if (pautas.length === 0) {
-      return `<div class="empty-state"><div class="icon"></div><p>Nenhuma pauta encontrada.</p></div>`;
+      return `<div class="empty-state"><div class="icon">📭</div><p>Nenhuma pauta encontrada.</p></div>`;
     }
     let html = '';
     pautas.forEach(p => {
-      const criador = allU.find(u => u.id === p.createdBy);
-      const criadorNome = criador ? criador.name : 'Desconhecido';
-      const statusBadge = p.status === 'pending'
-        ? '<span class="status-badge status-pending">⏳ Pendente</span>'
-        : '<span class="status-badge status-active">✅ Ativa</span>';
-      const qtdPermitidos = p.allowedUsers ? p.allowedUsers.length : 0;
-
-      html += `
-        <div class="pauta-card" onclick="abrirPauta('${p.id}')">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;">
-            <h3 style="flex:1;">📌 ${escapeHTML(p.title)}</h3>
-            ${statusBadge}
-          </div>
-          <div class="meta">
-            <span>📅 Reunião: ${formatDateBR(p.date)}</span>
-            <span>👤 Por: ${escapeHTML(criadorNome)}</span>
-            ${p.status === 'active' ? `<span>🔒 ${qtdPermitidos} pessoa(s) autorizada(s)</span>` : ''}
-          </div>
-        </div>
-      `;
+      html += renderExpandedPauta(p, allU, isAdmin, mode);
     });
     return html;
+  }
+
+  function renderExpandedPauta(p, allU, isAdmin, mode) {
+    const criador = allU.find(u => u.id === p.createdBy);
+    const criadorNome = criador ? criador.name : 'Desconhecido';
+    const statusBadge = p.status === 'pending'
+      ? '<span class="status-badge status-pending">⏳ Pendente</span>'
+      : '<span class="status-badge status-active">✅ Ativa</span>';
+
+    const usuariosPermitidos = p.allowedUsers && p.allowedUsers.length > 0
+      ? p.allowedUsers.map(uid => allU.find(u => u.id === uid)).filter(Boolean).map(u => u.name).join(', ')
+      : 'Nenhum';
+
+    let actionsHTML = '';
+
+    if (isAdmin) {
+      if (p.status === 'pending') {
+        actionsHTML = `
+          <div class="actions-row">
+            <button class="btn btn-success btn-sm" onclick="aprovarPauta('${p.id}')">✅ Aprovar e Definir Acessos</button>
+            <button class="btn btn-danger btn-sm" onclick="excluirPauta('${p.id}')">🗑️ Excluir</button>
+          </div>
+        `;
+      } else {
+        actionsHTML = `
+          <div class="actions-row">
+            <button class="btn btn-outline btn-sm" onclick="editarPermissoes('${p.id}')">✏️ Editar Permissões</button>
+            <button class="btn btn-danger btn-sm" onclick="excluirPauta('${p.id}')">🗑️ Excluir</button>
+          </div>
+        `;
+      }
+    } else if (mode === 'minhas' && p.status === 'pending' && p.createdBy === currentUser.id) {
+      actionsHTML = `
+        <div class="actions-row">
+          <button class="btn btn-outline btn-sm" onclick="editarMinhaPauta('${p.id}')">✏️ Editar</button>
+          <button class="btn btn-danger btn-sm" onclick="excluirMinhaPauta('${p.id}')">🗑️ Cancelar Envio</button>
+        </div>
+      `;
+    }
+
+    const pendingWarning = (p.status === 'pending' && !isAdmin)
+      ? `<div style="color:var(--orange);font-size:0.85rem;margin:10px 0;">⏳ Esta pauta está aguardando aprovação do administrador.</div>`
+      : '';
+
+    return `
+      <div class="pauta-card-expanded">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;">
+          <h3 style="flex:1;">📌 ${escapeHTML(p.title)}</h3>
+          ${statusBadge}
+        </div>
+        <div class="meta">
+          <span>📅 Reunião: <strong>${formatDateBR(p.date)}</strong></span>
+          <span>👤 Criado por: <strong>${escapeHTML(criadorNome)}</strong></span>
+          <span>🕐 ${formatDate(p.createdAt)}</span>
+        </div>
+        <div class="pauta-content-display">${escapeHTML(p.content)}</div>
+        ${pendingWarning}
+        <div style="color:var(--text2);font-size:0.8rem;margin-top:8px;">
+          🔒 ${p.status === 'active' ? 'Visível para' : 'Sugestão de acesso'}: <strong style="color:#fff;">${escapeHTML(usuariosPermitidos)}</strong>
+          ${isAdmin && p.status === 'active' ? '<span style="color:var(--gold);"> | 👑 Admin vê tudo</span>' : ''}
+        </div>
+        ${actionsHTML}
+      </div>
+    `;
   }
 
   // ============ NOVA PAUTA ============
@@ -694,7 +874,7 @@ body {
           </label>
         `;
       });
-      usuariosHTML += '</div><p style="color:var(--text2);font-size:0.75rem;margin-top:6px;">Marque os usuários que poderão visualizar esta pauta.</p>';
+      usuariosHTML += '</div><p style="color:var(--text2);font-size:0.75rem;margin-top:6px;">Marque os responsáveis que receberão a pauta por e-mail.</p>';
     }
 
     const isAdmin = currentUser.role === 'admin';
@@ -721,7 +901,7 @@ body {
             <textarea id="pautaContent" rows="5" placeholder="Descreva os tópicos da reunião..." required></textarea>
           </div>
           <div class="form-group">
-            <label>🔒 Permitir acesso a:</label>
+            <label>🔒 Responsáveis (receberão e-mail):</label>
             ${usuariosHTML}
           </div>
           <button type="submit" class="btn btn-primary">${submitLabel}</button>
@@ -754,88 +934,14 @@ body {
     };
     await pautasRef.child(nova.id).set(nova);
     document.querySelector('.modal-overlay')?.remove();
-    showToast(isAdmin ? 'Pauta criada e publicada com sucesso!' : 'Pauta enviada para aprovação do administrador!', 'success');
-    await renderDashboard();
-  }
 
-  // ============ ABRIR PAUTA ============
-  window.abrirPauta = async (id) => {
-    if (!currentUser) return;
-    const snap = await pautasRef.child(id).once('value');
-    const pauta = snap.val();
-    if (!pauta) { showToast('Pauta não encontrada.','error'); return; }
-
-    const snapU = await usersRef.once('value');
-    const allU = objToArray(snapU.val());
-    const isAdmin = currentUser.role === 'admin';
-    const podeVer = isAdmin || (pauta.allowedUsers && pauta.allowedUsers.includes(currentUser.id)) || pauta.createdBy === currentUser.id;
-    if (!podeVer) { showToast('Você não tem permissão para ver esta pauta.','error'); return; }
-
-    const criador = allU.find(u => u.id === pauta.createdBy);
-    const criadorNome = criador ? criador.name : 'Desconhecido';
-    const usuariosPermitidos = pauta.allowedUsers
-      ? pauta.allowedUsers.map(uid => allU.find(u => u.id === uid)).filter(Boolean).map(u => u.name).join(', ')
-      : 'Nenhum';
-
-    const statusBadge = pauta.status === 'pending'
-      ? '<span class="status-badge status-pending">⏳ Pendente de Aprovação</span>'
-      : '<span class="status-badge status-active">✅ Ativa</span>';
-
-    let adminActions = '';
-    if (isAdmin) {
-      if (pauta.status === 'pending') {
-        adminActions = `
-          <div class="actions-row">
-            <button class="btn btn-success btn-sm" onclick="aprovarPauta('${pauta.id}')">✅ Aprovar e Definir Acessos</button>
-            <button class="btn btn-danger btn-sm" onclick="excluirPauta('${pauta.id}')">🗑️ Excluir</button>
-          </div>
-        `;
-      } else {
-        adminActions = `
-          <div class="actions-row">
-            <button class="btn btn-outline btn-sm" onclick="editarPermissoes('${pauta.id}')">✏️ Editar Permissões</button>
-            <button class="btn btn-danger btn-sm" onclick="excluirPauta('${pauta.id}')">🗑️ Excluir</button>
-          </div>
-        `;
-      }
-    } else if (pauta.status === 'pending' && pauta.createdBy === currentUser.id) {
-      adminActions = `
-        <div class="actions-row">
-          <button class="btn btn-outline btn-sm" onclick="editarMinhaPauta('${pauta.id}')">✏️ Editar</button>
-          <button class="btn btn-danger btn-sm" onclick="excluirMinhaPauta('${pauta.id}')">🗑️ Cancelar Envio</button>
-        </div>
-      `;
+    // Dispara e-mail para os responsáveis se for admin (pauta já ativa)
+    if (isAdmin && allowedUsers.length > 0) {
+      await sendEmailToAllowedUsers(nova, allowedUsers);
     }
 
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.innerHTML = `
-      <div class="modal">
-        <button class="close-btn" onclick="this.closest('.modal-overlay').remove()">✕</button>
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
-          <h2 style="margin-bottom:0;flex:1;">📌 ${escapeHTML(pauta.title)}</h2>
-          ${statusBadge}
-        </div>
-        <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:16px;color:var(--text2);font-size:0.85rem;">
-          <span>📅 Data da reunião: <strong style="color:#fff;">${formatDateBR(pauta.date)}</strong></span>
-          <span>👤 Criado por: <strong style="color:#fff;">${escapeHTML(criadorNome)}</strong></span>
-          <span>🕐 Registrado em: <strong style="color:#fff;">${formatDate(pauta.createdAt)}</strong></span>
-        </div>
-        <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:20px;margin-bottom:16px;white-space:pre-wrap;line-height:1.7;font-size:0.93rem;">
-          ${escapeHTML(pauta.content)}
-        </div>
-        ${pauta.status === 'active' ? `
-          <div style="color:var(--text2);font-size:0.8rem;">🔒 Visível para: <strong style="color:#fff;">${escapeHTML(usuariosPermitidos)}</strong>
-            ${isAdmin ? ' | <span style="color:var(--gold);">Você vê tudo como admin</span>' : ''}
-          </div>
-        ` : `
-          <div style="color:var(--orange);font-size:0.85rem;margin-bottom:10px;">⏳ Esta pauta está aguardando aprovação do administrador.</div>
-        `}
-        ${adminActions}
-      </div>
-    `;
-    document.body.appendChild(overlay);
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+    showToast(isAdmin ? 'Pauta criada e publicada com sucesso!' : 'Pauta enviada para aprovação do administrador!', 'success');
+    await renderDashboard();
   }
 
   // ============ APROVAR PAUTA (ADMIN) ============
@@ -863,7 +969,7 @@ body {
           </label>
         `;
       });
-      usuariosHTML += '</div><p style="color:var(--text2);font-size:0.75rem;margin-top:6px;">Selecione quem poderá visualizar esta pauta após a aprovação.</p>';
+      usuariosHTML += '</div><p style="color:var(--text2);font-size:0.75rem;margin-top:6px;">Selecione quem poderá visualizar esta pauta. Um e-mail será enviado aos selecionados.</p>';
     }
 
     document.querySelector('.modal-overlay')?.remove();
@@ -874,7 +980,7 @@ body {
         <button class="close-btn" onclick="this.closest('.modal-overlay').remove()">✕</button>
         <h2>✅ Aprovar Pauta</h2>
         <p style="color:var(--text2);margin-bottom:14px;">Pauta: <strong style="color:#fff;">${escapeHTML(pauta.title)}</strong></p>
-        <p style="color:var(--green);font-size:0.85rem;margin-bottom:14px;">✔️ A pauta será aprovada e publicada imediatamente após salvar as permissões.</p>
+        <p style="color:var(--green);font-size:0.85rem;margin-bottom:14px;">✔️ A pauta será aprovada e publicada. Um e-mail será disparado para os responsáveis selecionados.</p>
         <div class="form-group">
           <label>🔒 Permitir acesso a:</label>
           ${usuariosHTML}
@@ -893,6 +999,14 @@ body {
       status: 'active',
       allowedUsers: allowedUsers
     });
+
+    // Dispara e-mail para os responsáveis após aprovação
+    const snap = await pautasRef.child(pId).once('value');
+    const pauta = snap.val();
+    if (pauta && allowedUsers.length > 0) {
+      await sendEmailToAllowedUsers(pauta, allowedUsers);
+    }
+
     document.querySelector('.modal-overlay')?.remove();
     showToast('Pauta aprovada e publicada com sucesso!', 'success');
     await renderDashboard();
@@ -989,7 +1103,7 @@ body {
       <div class="modal">
         <button class="close-btn" onclick="this.closest('.modal-overlay').remove()">✕</button>
         <h2>✏️ Editar Minha Pauta</h2>
-        <p style="color:var(--orange);font-size:0.85rem;margin-bottom:14px;">️ Alterações serão reenviadas para aprovação.</p>
+        <p style="color:var(--orange);font-size:0.85rem;margin-bottom:14px;">🔄 Alterações serão reenviadas para aprovação.</p>
         <form onsubmit="handleEditarMinhaPauta(event, '${pId}')" autocomplete="off">
           <div class="form-group">
             <label>Título</label>
